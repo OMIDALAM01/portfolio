@@ -88,24 +88,32 @@ form button {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
     gap: 1em;
+    padding: 1em;
 }
 
 .projects article {
     display: grid;
-    grid-template-rows: subgrid;
-    grid-row: span 3;
-    gap: 1em;
+    grid-template-rows: auto 1fr auto;
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .projects article h2 {
+    margin: 0 0 0.5em 0;
+    font-size: 1.2em;
+}
+
+.projects article img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 0.5em;
+}
+
+.projects article p {
     margin: 0;
-}
-
-h1 {
-    font-size: 400%;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    line-height: 1.1;
-    text-wrap: balance;
+    font-size: 0.9em;
+    color: #555;
 }
