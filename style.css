@@ -117,3 +117,8 @@ form button {
     font-size: 0.9em;
     color: #555;
 }
+
+nav a.current {
+    border-bottom: 0.4em solid var(--color-accent);
+    padding-bottom: 0.1em;
+  }
