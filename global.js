@@ -70,7 +70,7 @@ select.addEventListener('input', (event) => {
 if (localStorage.colorScheme) {
     setColorScheme(localStorage.colorScheme);
 } else {
-    setColorScheme('auto'); // Default to 'auto'
+    setColorScheme('auto');
 }
 
 export async function fetchJSON(url) {
@@ -102,4 +102,15 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
         `;
         containerElement.appendChild(article);
     });
+}
+
+export async function fetchGitHubData(username) {
+    const url = `https://api.github.com/users/${username}`;
+    try {
+        const data = await fetchJSON(url);
+        return data;
+    } catch (error) {
+        console.error("Error fetching GitHub data:", error);
+        return null;
+    }
 }
