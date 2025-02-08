@@ -34,17 +34,38 @@ function renderPieChart(data) {
 
     const arcGenerator = d3.arc().innerRadius(0).outerRadius(radius);
 
-    const pie = d3.pie();
+    const pie = d3.pie().value(d => d.value);
     const pieData = pie(data);
 
     svg.selectAll('path')
-        .data(pieData)
-        .join('path')
-        .attr('d', arcGenerator)
-        .attr('fill', (d, i) => color(i))
-        .attr('transform', `translate(${radius - 50}, ${radius - 50})`);
+    .data(pieData)
+    .join('path')
+    .attr('d', arcGenerator)
+    .attr('fill', (d, i) => color(i))
+    .attr('transform', `translate(${radius}, ${radius})`);
+
+    renderLegend(data, color);
 }
 
-const pieData = [1, 2, 3, 4, 5];
-renderPieChart(pieData);
+function renderLegend(data, color) {
+    const legend = d3.select('.legend');
 
+    legend.selectAll('li').remove();
+
+    data.forEach((d, idx) => {
+        legend.append('li')
+            .attr('style', `--color:${color(idx)}`)
+            .html(`<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`);
+    });
+}
+
+const pieData = [
+    { value: 1, label: 'Apples' },
+    { value: 2, label: 'Oranges' },
+    { value: 3, label: 'Mangos' },
+    { value: 4, label: 'Pears' },
+    { value: 5, label: 'Limes' },
+    { value: 5, label: 'Cherries' }
+];
+
+renderPieChart(pieData);
