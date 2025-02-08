@@ -117,3 +117,13 @@ form button {
     font-size: 0.9em;
     color: #555;
 }
+
+.project-year {
+    font-family: Baskerville, serif;
+    font-variant-numeric: oldstyle-nums;
+    font-style: italic;
+    text-align: right;
+    margin-top: 10px;
+    color: gray;
+}
+
