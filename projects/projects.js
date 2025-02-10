@@ -1,5 +1,24 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
+let query = '';
+
+const searchInput = document.querySelector('.searchBar');
+
+searchInput.addEventListener('input', (event) => {
+    query = event.target.value.toLowerCase(); // Convert input to lowercase for case-insensitive search
+
+    filterProjects();
+});
+
+function filterProjects() {
+    fetchJSON('./lib/projects.json').then(projects => {
+        const filteredProjects = projects.filter(project => 
+            project.title.toLowerCase().includes(query) // Check if title contains query
+        );
+        renderProjects(filteredProjects, projectsContainer, 'h2');
+    });
+}
+
 import { fetchJSON, renderProjects } from '../global.js';
 
 const projectsContainer = document.querySelector('.projects');
@@ -8,6 +27,10 @@ async function loadProjects() {
     const projects = await fetchJSON('./lib/projects.json');
     if (projects) {
         renderProjects(projects, projectsContainer, 'h2');
+        
+        // Process and render the pie chart using project data
+        const pieData = processProjectData(projects); // Process data dynamically
+        renderPieChart(pieData); // Render the pie chart with actual project data
     }
 }
 
@@ -69,3 +92,18 @@ const pieData = [
 ];
 
 renderPieChart(pieData);
+
+function processProjectData(projects) {
+    // Group and count projects by year
+    const rolledData = d3.rollups(
+        projects,
+        v => v.length, // Count the number of projects in each year
+        d => d.year // Group by year
+    );
+
+    // Convert the grouped data into the format required for the pie chart
+    return rolledData.map(([year, count]) => ({
+        value: count,
+        label: year
+    }));
+}
