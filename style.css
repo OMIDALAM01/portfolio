@@ -171,5 +171,20 @@ form button {
     border-radius: 50%;
 }
 
+.selected {
+    --color: oklch(60% 45% 0) !important;
+}
 
+.selected path {
+    fill: var(--color);
+}
+
+path {
+    cursor: pointer;
+    transition: opacity 300ms;
+}
+
+svg:has(path:hover) path:not(:hover) {
+    opacity: 0.5;
+}
 

@@ -1,21 +1,36 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 
+let selectedIndex = -1;
+
 let query = '';
 
 const searchInput = document.querySelector('.searchBar');
 
 searchInput.addEventListener('input', (event) => {
-    query = event.target.value.toLowerCase(); // Convert input to lowercase for case-insensitive search
+    query = event.target.value.toLowerCase();
 
     filterProjects();
 });
 
 function filterProjects() {
     fetchJSON('./lib/projects.json').then(projects => {
-        const filteredProjects = projects.filter(project => 
-            project.title.toLowerCase().includes(query) // Check if title contains query
-        );
+        let filteredProjects = projects;
+
+        if (selectedIndex !== -1) {
+            const selectedYear = pieData[selectedIndex]?.label;
+            filteredProjects = filteredProjects.filter(project => project.year === selectedYear);
+        }
+
+        if (query) {
+            filteredProjects = filteredProjects.filter(project => 
+                Object.values(project).join('\n').toLowerCase().includes(query)
+            );
+        }
+
         renderProjects(filteredProjects, projectsContainer, 'h2');
+
+        const pieData = processProjectData(filteredProjects);
+        renderPieChart(pieData);
     });
 }
 
@@ -28,9 +43,8 @@ async function loadProjects() {
     if (projects) {
         renderProjects(projects, projectsContainer, 'h2');
         
-        // Process and render the pie chart using project data
-        const pieData = processProjectData(projects); // Process data dynamically
-        renderPieChart(pieData); // Render the pie chart with actual project data
+        const pieData = processProjectData(projects);
+        renderPieChart(pieData);
     }
 }
 
@@ -50,6 +64,10 @@ updateProjectCount();
 
 function renderPieChart(data) {
     const svg = d3.select('#projects-plot');
+    svg.selectAll('*').remove();
+
+    if (!data.length) return;
+
     const width = 100;
     const radius = width / 2;
 
@@ -60,27 +78,37 @@ function renderPieChart(data) {
     const pie = d3.pie().value(d => d.value);
     const pieData = pie(data);
 
-    svg.selectAll('path')
-    .data(pieData)
-    .join('path')
-    .attr('d', arcGenerator)
-    .attr('fill', (d, i) => color(i))
-    .attr('transform', `translate(${radius}, ${radius})`);
+    const paths = svg.selectAll('path')
+        .data(pieData)
+        .join('path')
+        .attr('d', arcGenerator)
+        .attr('fill', (d, i) => color(i))
+        .attr('transform', `translate(${radius}, ${radius})`)
+        .attr('cursor', 'pointer')
+        .on('click', (event, d) => {
+            selectedIndex = selectedIndex === d.index ? -1 : d.index;
+            filterProjectsByYear(data[selectedIndex]?.label || null);
+        });
 
     renderLegend(data, color);
 }
 
 function renderLegend(data, color) {
     const legend = d3.select('.legend');
+    legend.selectAll('*').remove();
 
-    legend.selectAll('li').remove();
-
-    data.forEach((d, idx) => {
-        legend.append('li')
-            .attr('style', `--color:${color(idx)}`)
-            .html(`<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`);
-    });
+    legend.selectAll('li')
+        .data(data)
+        .join('li')
+        .attr('class', (_, i) => (i === selectedIndex ? 'selected' : ''))
+        .attr('style', (_, i) => `--color:${color(i)}`)
+        .html((d) => `<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`)
+        .on('click', (_, i) => {
+            selectedIndex = selectedIndex === i ? -1 : i;
+            updatePieChart();
+        });
 }
+
 
 const pieData = [
     { value: 1, label: 'Apples' },
@@ -94,16 +122,44 @@ const pieData = [
 renderPieChart(pieData);
 
 function processProjectData(projects) {
-    // Group and count projects by year
     const rolledData = d3.rollups(
         projects,
-        v => v.length, // Count the number of projects in each year
-        d => d.year // Group by year
+        v => v.length,
+        d => d.year
     );
 
-    // Convert the grouped data into the format required for the pie chart
     return rolledData.map(([year, count]) => ({
         value: count,
         label: year
     }));
 }
+
+function updatePieChart() {
+    d3.selectAll('path')
+        .attr('class', (_, i) => (i === selectedIndex ? 'selected' : ''));
+
+    d3.selectAll('.legend li')
+        .attr('class', (_, i) => (i === selectedIndex ? 'selected' : ''));
+}
+
+function filterProjectsByYear(selectedYear) {
+    fetchJSON('./lib/projects.json').then(projects => {
+        let filteredProjects = projects;
+
+        if (selectedYear) {
+            filteredProjects = filteredProjects.filter(project => project.year === selectedYear);
+        }
+
+        if (query) {
+            filteredProjects = filteredProjects.filter(project => 
+                Object.values(project).join('\n').toLowerCase().includes(query)
+            );
+        }
+
+        renderProjects(filteredProjects, projectsContainer, 'h2');
+
+        const pieData = processProjectData(filteredProjects);
+        renderPieChart(pieData);
+    });
+}
+
