@@ -86,7 +86,6 @@ function createScatterplot() {
         .attr("viewBox", `0 0 ${width} ${height}`)
         .style("overflow", "visible");
 
-    // Define scales
     const xScale = d3.scaleTime()
         .domain(d3.extent(commits, (d) => d.datetime))
         .range([0, width])
@@ -96,7 +95,6 @@ function createScatterplot() {
         .domain([0, 24])
         .range([height, 0]);
 
-    // Append dots to scatterplot
     const dots = svg.append("g").attr("class", "dots");
 
     dots.selectAll("circle")
