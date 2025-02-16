@@ -227,3 +227,22 @@ circle:hover {
     transition: opacity 0.2s ease-in-out;
 }
 
+circle.selected {
+    fill: #ff6b6b;
+    stroke: black;
+    stroke-width: 1px;
+}
+
+#language-breakdown {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+#language-breakdown dt {
+    font-weight: bold;
+}
+
+#selection-count {
+    font-weight: bold;
+    margin-top: 10px;
+}
