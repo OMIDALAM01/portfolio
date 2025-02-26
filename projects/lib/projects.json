@@ -1,5 +1,11 @@
 [
     {
+        "title": "Bikewatching: Boston Traffic Visualization",
+        "image": "images/bikewatching_project.png",
+        "description": "An interactive map that visualizes Boston's bike traffic using Mapbox and D3.js.",
+        "url": "https://omidalam01.github.io/portfolio/project"
+    },       
+    {
         "title": "Project 1",
         "year": "2013",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
