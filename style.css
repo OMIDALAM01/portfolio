@@ -246,3 +246,8 @@ circle.selected {
     font-weight: bold;
     margin-top: 10px;
 }
+
+.commit.selected {
+    stroke: red;
+    stroke-width: 2px;
+}
